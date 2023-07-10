@@ -1,3 +1,6 @@
+import csv
+import os
+
 import httpx
 from selectolax.parser import HTMLParser
 from dataclasses import dataclass, asdict
@@ -52,6 +55,19 @@ class Scraper:
 
         return asdict(item)
 
+    # write to csv function
+    def to_csv(self, datas, filename):
+        filepath = os.getcwd() + filename
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        for data in datas:
+            with open(filename, 'a', encoding='utf-8') as f:
+                headers = ['var1', 'var2', 'var3']
+                writer = csv.DictWriter(f, delimiter=',', lineterminator='\n', fieldnames=headers)
+                if os.path.exists(filepath):
+                    writer.writeheader()
+                writer.writerow(data)
+
     # main function
     def main(self):
         # define targerted url
@@ -59,8 +75,9 @@ class Scraper:
 
         # main program
         response = self.reg_fetch(url)
-        result = self.parse(response)
-        print(result)
+        datas = self.parse(response)
+        print(datas)
+        self.to_csv(datas, 'result.csv')
 
 if __name__ == '__main__':
     s = Scraper()
